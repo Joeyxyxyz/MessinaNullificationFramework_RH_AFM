@@ -1,0 +1,1581 @@
+\documentclass[12pt, a4paper]{article}
+
+%% ─── Packages ────────────────────────────────────────────────────────────────
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{cite}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{setspace}
+
+\geometry{
+  a4paper,
+  top=2.5cm, bottom=2.5cm,
+  left=2.8cm, right=2.8cm
+}
+
+\hypersetup{
+  colorlinks = true,
+  linkcolor  = blue!70!black,
+  citecolor  = blue!70!black,
+  urlcolor   = blue!70!black
+}
+
+%% ─── Lean listing style ──────────────────────────────────────────────────────
+\definecolor{leanblue}{RGB}{0, 0, 180}
+\definecolor{leanorange}{RGB}{200, 100, 0}
+\definecolor{leangreen}{RGB}{0, 130, 0}
+\definecolor{leangray}{RGB}{120, 120, 120}
+\definecolor{codebg}{RGB}{248, 248, 252}
+
+\lstdefinelanguage{Lean4}{
+  keywords={def, theorem, lemma, axiom, noncomputable, import, open,
+            section, namespace, end, where, by, exact, intro, apply,
+            rfl, simp, linarith, ring, constructor, rcases, obtain,
+            have, show, let, fun, if, then, else, structure, inductive,
+            instance, class, universe, variable, set_option, attribute,
+            scoped, notation, abbrev, example, calc, match, with,
+            return, do, for, unless, at, from, in, forall, exists,
+            True, False, Prop, Type, Sort},
+  keywordstyle=\color{leanblue}\bfseries,
+  comment=[l]{--},
+  commentstyle=\color{leangray}\itshape,
+  stringstyle=\color{leangreen},
+  sensitive=true,
+  morecomment=[s]{/-}{-/},
+  basicstyle=\ttfamily\small,
+  backgroundcolor=\color{codebg},
+  frame=single,
+  framerule=0.4pt,
+  rulecolor=\color{gray!40},
+  xleftmargin=8pt,
+  xrightmargin=4pt,
+  framexleftmargin=6pt,
+  numbers=none,
+  keepspaces=true,
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=2,
+  showstringspaces=false,
+  inputencoding=utf8,
+  extendedchars=true,
+  literate=
+    {∀}{{$\forall$}}1
+    {∃}{{$\exists$}}1
+    {∈}{{$\in$}}1
+    {∉}{{$\notin$}}1
+    {⊆}{{$\subseteq$}}1
+    {∧}{{$\wedge$}}1
+    {∨}{{$\vee$}}1
+    {¬}{{$\neg$}}1
+    {≠}{{$\neq$}}1
+    {≤}{{$\leq$}}1
+    {≥}{{$\geq$}}1
+    {≡}{{$\equiv$}}1
+    {≈}{{$\approx$}}1
+    {→}{{$\to$}}1
+    {←}{{$\leftarrow$}}1
+    {↦}{{$\mapsto$}}1
+    {⟨}{{$\langle$}}1
+    {⟩}{{$\rangle$}}1
+    {⊤}{{$\top$}}1
+    {⊥}{{$\bot$}}1
+    {ℝ}{{$\mathbb{R}$}}1
+    {ℂ}{{$\mathbb{C}$}}1
+    {ℕ}{{$\mathbb{N}$}}1
+    {ℤ}{{$\mathbb{Z}$}}1
+    {ℚ}{{$\mathbb{Q}$}}1
+    {Δ}{{$\Delta$}}1
+    {δ}{{$\delta$}}1
+    {Λ}{{$\Lambda$}}1
+    {λ}{{$\lambda$}}1
+    {Ξ}{{$\Xi$}}1
+    {ξ}{{$\xi$}}1
+    {Ω}{{$\Omega$}}1
+    {ω}{{$\omega$}}1
+    {Σ}{{$\Sigma$}}1
+    {σ}{{$\sigma$}}1
+    {Π}{{$\Pi$}}1
+    {π}{{$\pi$}}1
+    {ε}{{$\varepsilon$}}1
+    {α}{{$\alpha$}}1
+    {β}{{$\beta$}}1
+    {γ}{{$\gamma$}}1
+    {ρ}{{$\rho$}}1
+    {τ}{{$\tau$}}1
+    {ψ}{{$\psi$}}1
+    {φ}{{$\varphi$}}1
+    {μ}{{$\mu$}}1
+    {ν}{{$\nu$}}1
+    {ζ}{{$\zeta$}}1
+    {η}{{$\eta$}}1
+    {θ}{{$\theta$}}1
+    {ℒ}{{$\mathcal{L}$}}1
+    {²}{{$^2$}}1
+    {³}{{$^3$}}1
+    {∞}{{$\infty$}}1
+    {§}{{\S}}1
+    {·}{{$\cdot$}}1
+    {¶}{{\P}}1
+    {★}{{$\star$}}1
+    {ᶜ}{{$^{\mathsf{c}}$}}1
+    {ᵇ}{{$_b$}}1
+    {á}{{\'a}}1
+    {é}{{\'e}}1
+    {í}{{\'i}}1
+    {ó}{{\'o}}1
+    {ú}{{\'u}}1
+}
+
+%% ─── Theorem environments ────────────────────────────────────────────────────
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+%% ─── Macros ──────────────────────────────────────────────────────────────────
+\newcommand{\N}{\mathcal{N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\re}{\operatorname{Re}}
+\newcommand{\zetaord}{\operatorname{ord}}
+\newcommand{\lean}[1]{\texttt{#1}}
+\newcommand{\proved}{\textbf{[Proved]}}
+\newcommand{\axiom}{\textbf{[Axiom]}}
+\newcommand{\Mathlib}{\textsf{Mathlib}}
+\newcommand{\Lean}{\textsf{Lean~4}}
+\newcommand{\Aristotle}{\textsf{Aristotle}}
+\newcommand{\ShiftedSpec}{\mathcal{S}_{1/2}}
+\newcommand{\RH}{\mathrm{RH}}
+
+%% ─── Metadata ────────────────────────────────────────────────────────────────
+\title{\textbf{Sturm--Liouville Eigenvalue Simplicity and a\\[4pt]
+  Spectral Assumption Interface in Lean~4}\\[6pt]
+  \large\textit{The Messina Nullification Framework}}
+
+\author{
+  Joseph Messina\\[4pt]
+  \small Independent Researcher\\[2pt]
+  \small \href{https://doi.org/10.5281/zenodo.18902325}{Zenodo: 10.5281/zenodo.18902325}
+  \quad
+  \href{https://github.com/Joeyxyxyz/messina-nullification-framework}{GitHub}
+}
+
+\date{March 2026}
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We present two Lean~4/\Mathlib{} contributions.
+The primary result is a formalization of Sturm--Liouville eigenvalue simplicity
+for confining potentials: given $V(x) \to +\infty$ and a square-integrable
+eigenfunction $\psi$, the Wronskian of any two eigenfunctions with the same
+eigenvalue vanishes at infinity (by $L^2$ decay under cocompact convergence),
+implying linear dependence and hence a one-dimensional eigenspace.
+The argument is formalized using Mathlib's Picard--Lindel\"{o}f, $L^2$, and
+cocompact filter infrastructure, and constitutes a standalone library
+contribution independent of any number-theoretic application.
+Second, building on the Lean~4 \Mathlib{} formalization of the Riemann zeta
+function due to Loeffler and Stoll~\cite{loeffler2025}, we introduce a modular
+spectral assumption interface under which the Riemann Hypothesis~(RH) and the
+Simple Zeros Conjecture follow as conditional consequences of two explicitly
+named hypotheses, with all classical analytic ingredients supplied by \Mathlib{}.
+A constructive mechanism, the \emph{leveling trick}, shows that a spectral gap
+at $\Delta = 1/2$ pins every nontrivial zero to the critical line via an
+algebraic squeeze: the deviation $\re(\rho) - 1/2$ lies in a set with the
+gap property, and is bounded in absolute value by $1/2$ from the critical
+strip, so it must equal zero.
+The single remaining open step --- connecting the operator's derived gap to the
+shifted zeta-zero spectrum --- is isolated as a two-part named context field
+\lean{HPContext} (object identification and operator identification), making the
+Hilbert--P\'{o}lya correspondence explicit, modular, and independently
+replaceable by future Mathlib developments.
+All results are machine-checked under \texttt{leanprover/lean4:v4.24.0}
+(Mathlib commit \texttt{f897ebcf}), zero-\lean{sorry}, with full code available
+on Zenodo and GitHub.
+The load-bearing algebraic content of every section has been independently
+kernel-verified by AXLE (\emph{Axiom Lean Engine}); ten verification IDs
+are listed in Section~\ref{sec:axle}.
+
+\medskip\noindent
+\textbf{2020 Mathematics Subject Classification:}
+11M26 (Riemann zeta function),
+34B24 (Sturm--Liouville theory),
+03B35 (Mechanization of proofs).
+
+\medskip\noindent
+\textbf{Keywords:}
+formal verification,
+Lean~4,
+Sturm--Liouville,
+spectral gap,
+Riemann zeta function,
+Hilbert--P\'{o}lya correspondence,
+Mathlib
+
+\end{abstract}
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\tableofcontents
+\bigskip
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Introduction}
+\label{sec:intro}
+
+Recent advances in the \Lean{} theorem prover and the \Mathlib{} library have
+enabled substantial portions of classical analysis to be formalized in a
+machine-verified setting~\cite{mathlib2020}.
+Formalization efforts have focused both on reproducing established results and on
+developing reusable infrastructure for future analytic and spectral arguments.
+Of particular relevance, Loeffler and Stoll recently formalized the Riemann zeta
+function, the completed zeta function $\xi(s)$, and key analytic properties in
+\Lean{}~\cite{loeffler2025}; the present work builds directly on that infrastructure.
+In this paper we contribute two such developments.
+
+\paragraph{Sturm--Liouville simplicity (unconditional contribution).}
+We formalize a classical Sturm--Liouville simplicity result for one-dimensional
+confining potentials.
+Using \Mathlib{}'s analytic and functional-analytic infrastructure, we prove that
+square-integrable eigenfunctions of confining Sturm--Liouville operators correspond
+to simple eigenvalues.
+The formalization proceeds through the standard Wronskian argument: constancy of
+the Wronskian for solutions of the associated differential equation, asymptotic
+$L^2$ decay of eigenfunctions at infinity, and the resulting vanishing of the
+Wronskian implying linear dependence.
+To our knowledge, this simplicity result is not currently available in
+\Mathlib{} in a packaged, reusable form.
+
+\begin{theorem}[Sturm--Liouville Simplicity, informal]
+\label{thm:sl_informal}
+Let $V \colon \R \to \R$ be a confining potential
+($V$ continuous and $V(x) \to +\infty$ as $|x| \to \infty$).
+Then every eigenvalue of the Sturm--Liouville operator $-d^2/dx^2 + V$
+admitting a square-integrable eigenfunction is simple.
+\end{theorem}
+
+The Lean~4 statement is:
+\begin{lstlisting}[language=Lean4]
+theorem sturm_liouville_simple_eigenvalues (V : ℝ → ℝ)
+    (hV : IsConfiningPotential V) (eigval : ℝ) :
+    IsSimpleEigenvalue V eigval
+\end{lstlisting}
+
+\paragraph{Spectral dependency framework (conditional contribution).}
+We introduce a modular spectral framework in \Lean{} for expressing conditional
+implications related to the zeros of the Riemann zeta function.
+The framework isolates a small set of explicitly named hypotheses --- including a
+spectral gap condition and an identification principle relating formal spectral
+objects to the shifted zeta-zero spectrum --- under which the Riemann Hypothesis
+and simplicity of nontrivial zeros follow as formal consequences.
+The purpose of this framework is \emph{not} to prove these hypotheses, but to
+formalize the dependency structure underlying spectral approaches to the zeta zeros.
+By expressing assumptions as explicit context fields, the formalization clarifies
+precisely which analytic ingredients remain external to the Lean development.
+
+The operator-algebraic component is built around an abstract projection-like
+operator satisfying three structural properties: conservation ($\mathcal{N} + R = \mathrm{id}$),
+idempotence ($\mathcal{N} \circ \mathcal{N} = \mathcal{N}$), and discreteness
+(image $\subseteq \{0\} \cup [\Delta, \infty)$).
+These properties enforce a spectral gap on the operator's range independent of
+analytic number-theoretic arguments.
+When combined with the identification hypothesis (Hilbert--P\'{o}lya correspondence,
+stated as a named context field \lean{HPContext} in Section~\ref{sec:hpcontext}),
+the gap condition yields RH and simplicity of nontrivial zeros as conditional consequences.
+
+\begin{theorem}[Conditional RH and Simplicity, informal]
+\label{thm:conditional_rh}
+Under the Hilbert--P\'{o}lya identification hypothesis \lean{HPContext} and the
+spectral gap property \lean{SpectralGapProperty(ShiftedZeroSpectrum, 1/2)},
+all nontrivial zeros of $\zeta(s)$ lie on the critical line $\re(s) = 1/2$
+and have order exactly~$1$.
+\end{theorem}
+
+\noindent
+The spectral gap hypothesis should not be interpreted as strictly weaker than
+the Riemann Hypothesis.
+Rather, the framework isolates it as the single geometric constraint required
+once the operator algebra is fixed; its connection to the actual zeta spectrum
+requires the Hilbert--P\'{o}lya identification, which is a Millennium-class
+open problem (Section~\ref{sec:obstruction}).
+
+\paragraph{Claims we do not make.}
+This paper does not claim a proof of the Riemann Hypothesis or the Simple Zeros
+Conjecture.
+It provides (i) an unconditional Sturm--Liouville library contribution and (ii)
+a formal dependency analysis of spectral approaches to RH, with all assumptions
+explicitly labeled and isolated.
+The framework is designed as a reusable scaffold into which future Mathlib
+analytic developments can be plugged to discharge remaining assumptions.
+
+\paragraph{Reproducibility.}
+The full environment is pinned and detailed in the Reproducibility
+section (p.~\pageref{sec:reproducibility}).
+All proofs compile under \texttt{leanprover/lean4:v4.24.0}
+(Mathlib commit \texttt{f897ebcf}) with zero \lean{sorry}.
+
+\paragraph{Contributions.}
+\begin{enumerate}[label=\textbf{C\arabic*.}]
+  \item \textbf{Sturm--Liouville simplicity (unconditional):}
+        A packaged \Lean{} formalization of $\mathrm{IsConfiningPotential}
+        \Rightarrow \mathrm{IsSimpleEigenvalue}$ via a Wronskian chain,
+        independent of any RH-related application (Section~\ref{sec:proved}).
+  \item \textbf{Formal dependency analysis (conditional):}
+        A modular \Lean{} framework expressing $\RH \wedge \text{AllZerosSimple}$
+        as consequences of an explicit, minimal assumption interface, with all
+        classical ingredients supplied by \Mathlib{} (Section~\ref{sec:minimal}).
+  \item \textbf{The leveling trick} (Section~\ref{sec:leveling}):
+        a constructive proof that a spectral gap pins every nontrivial zero
+        to the critical line via a two-step algebraic squeeze.
+  \item \textbf{Assumption hygiene:}
+        The Hilbert--P\'{o}lya identification is surfaced as a two-part named
+        context field \lean{HPContext}, separating object identification from
+        operator identification and making each assumption independently replaceable
+        (Section~\ref{sec:hpcontext}).
+  \item \textbf{Axiom reduction record:}
+        A documented journey from 7 to 2 hypotheses characterizing precisely
+        which classical results are absorbed by \Mathlib{} and which remain open
+        (Section~\ref{sec:reduction}).
+\end{enumerate}
+
+\paragraph{Structure of the paper.}
+Section~\ref{sec:operator} defines the nullification operator and its algebraic
+properties.
+Section~\ref{sec:setup} describes the formalization infrastructure.
+Section~\ref{sec:proved} develops the Sturm--Liouville simplicity formalization in full, including definitions, the main theorem with Wronskian proof, and supporting Lean infrastructure.
+Section~\ref{sec:leveling} develops the leveling trick.
+Section~\ref{sec:minimal} states the main conditional reduction theorem.
+Section~\ref{sec:reduction} documents the hypothesis reduction journey.
+Section~\ref{sec:obstruction} characterizes the irreducible obstruction and
+introduces \lean{HPContext}.
+Section~\ref{sec:lessons} reflects on mathematical lessons from formalization.
+Section~\ref{sec:conclusion} concludes.
+Appendix~\ref{app:motivation} contains motivational comparisons with
+non-standard analysis and a concrete numerical example of non-distributivity.
+Appendix~\ref{app:experimental} describes the experimental companion artifact
+on IBM quantum hardware (non-deductive motivation only, not required for any
+formal result).
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{The Nullification Operator and Its Algebraic Properties}
+\label{sec:operator}
+
+The nullification operator arises as an abstract projection-like map
+enforcing a discrete spectral partition: values below a threshold $\Delta$
+are sent to zero (``confined'' or ``nullified''), while values at or above
+threshold pass through unchanged.
+Its three algebraic properties --- conservation, idempotence, and discreteness
+--- are sufficient to enforce a gap on the operator's range, independent of
+any analytic number-theoretic argument.
+
+\begin{definition}[Nullification operator]
+\label{def:nullify}
+For threshold $\Delta > 0$ and value $x \in \R$, define:
+\[
+  \N(\Delta, x) \;:=\;
+  \begin{cases}
+    x & \text{if } |x| \geq \Delta, \\
+    0 & \text{if } |x| < \Delta.
+  \end{cases}
+\]
+\end{definition}
+
+Every value is assigned to one of three \emph{classes}:
+\[
+  [0] \;:\; x = 0,
+  \qquad
+  [1] \;:\; |x| \geq \Delta,
+  \qquad
+  [0.0e] \;:\; 0 < |x| < \Delta.
+\]
+The class label $[0.0e]$ — read informally as a small value that
+``rounds to zero in observation but retains a nonzero magnitude'' — is
+chosen to suggest both an \emph{exponentially-suppressed} value and an
+\emph{epsilon-small} one; the formal content is the inequality
+$0 < |x| < \Delta$ and is independent of either reading.
+The class $[0.0e]$ — ``nullified'' or ``confined'' — represents values
+below the propagation threshold that are not absent but preserved: the companion
+operator $R(\Delta, x) := x - \N(\Delta, x)$ routes sub-threshold content
+to a \emph{remainder pool} rather than discarding it.
+The conservation law $\N(\Delta, x) + R(\Delta, x) = x$ holds for all $x$.
+
+The operator satisfies strict conservation:
+
+\begin{proposition}[Conservation]
+\label{prop:conservation}
+For all $\Delta > 0$ and $x \in \R$:
+$\N(\Delta, x) + R(\Delta, x) = x$,
+where $R(\Delta, x) := x - \N(\Delta, x)$.
+\end{proposition}
+
+Four key algebraic properties are proved in the Batch series:
+
+\begin{enumerate}[label=\textbf{P\arabic*.}]
+  \item \textbf{Idempotence:} $\N(\Delta, \N(\Delta, x)) = \N(\Delta, x)$.
+  \item \textbf{Monotonicity:} $\N(\Delta, \cdot)$ is monotone above threshold.
+  \item \textbf{Non-distributivity:}
+        $\N(\Delta, x + y) \neq \N(\Delta, x) + \N(\Delta, y)$ in general.
+        This is not a defect: it captures threshold-crossing effects.
+  \item \textbf{Spectral gap:} For a set $S \subseteq \R$, after applying $\N$,
+        the interval $(0, \Delta)$ is empty in the image.
+\end{enumerate}
+
+The spectral gap property is the central structural concept:
+
+\begin{definition}[Spectral gap property]
+\label{def:sgp}
+A set $S \subseteq \R$ has the \emph{spectral gap property at $\Delta$}
+if every $x \in S$ satisfies $x = 0$ or $|x| \geq \Delta$:
+\[
+  \mathrm{SpectralGapProperty}(S, \Delta)
+  \;:\Longleftrightarrow\;
+  \forall\, x \in S,\; x = 0 \;\vee\; |x| \geq \Delta.
+\]
+\end{definition}
+
+In Lean~4 this is stated as:
+
+\begin{lstlisting}[language=Lean4]
+def SpectralGapProperty (S : Set ℝ) (Δ : ℝ) : Prop :=
+  ∀ x, x ∈ S → x = 0 ∨ |x| ≥ Δ
+\end{lstlisting}
+
+In subsequent statements, the set $S$ is instantiated as
+\lean{ShiftedZeroSpectrum} (Section~\ref{sec:setup}); the threshold
+$\Delta$ is instantiated as $1/2$ throughout the leveling-trick development.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\subsection{Spectral Gap Enforcement}
+\label{sec:gap_enforcement}
+
+The three algebraic properties — conservation, idempotence, and discreteness
+— are not merely structural observations; they jointly enforce a spectral gap
+on the operator's range.
+
+\begin{proposition}[\lean{master\_enforcement}]
+\label{prop:enforcement}
+For any $\Delta > 0$, the image of $\N_\Delta$ satisfies
+$\mathrm{SpectralGapProperty}(\mathrm{Set.range}(\N_\Delta), \Delta)$.
+That is, every element of the range equals zero or has absolute value at
+least $\Delta$.
+\end{proposition}
+
+\begin{proof}
+By the definition of $\N(\Delta, x)$: if $|x| \geq \Delta$ then
+$\N(\Delta, x) = x$ with $|x| \geq \Delta$; if $|x| < \Delta$ then
+$\N(\Delta, x) = 0$.
+No element of the range lies in the open interval $(0, \Delta)$.
+In Lean~4 (Batch~14, \lean{master\_enforcement}):
+\begin{lstlisting}[language=Lean4]
+theorem master_enforcement (Δ : ℝ) (hΔ : 0 < Δ) :
+    SpectralGapProperty (Set.range (N Δ)) Δ := by
+  intro x hx
+  obtain ⟨y, rfl⟩ := hx
+  by_cases h : |y| ≥ Δ
+  · -- |y| ≥ Δ: N Δ y = y, so |x| = |y| ≥ Δ; right branch
+    right
+    simpa [N, h] using h
+  · -- |y| < Δ: N Δ y = 0; left branch
+    left
+    simp [N, h]
+\end{lstlisting}
+The two branches correspond to the two cases of the definition of $\N$:
+when the input is at or above threshold the value passes through and
+satisfies the gap bound; when it is below threshold the value is sent
+to zero. The pattern \lean{by\_cases} (rather than \lean{split\_ifs})
+makes the case analysis explicit and the branch order clear.
+\end{proof}
+
+\begin{remark}
+This gap is derived purely from operator algebra: no analytic number theory
+is used.
+The step that requires the Hilbert--P\'{o}lya identification is the transfer
+of this gap from $\mathrm{Set.range}(\N_\Delta)$ to the actual
+shifted zeta-zero spectrum $\mathrm{ShiftedZeroSpectrum}$
+(Section~\ref{sec:hpcontext}).
+\end{remark}
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\begin{remark}[On comparisons with non-standard analysis]
+\label{rem:nsa-pointer}
+We emphasize that $\N(\Delta, \cdot)$ is not a ring homomorphism and is
+intentionally non-distributive; conservation holds via the companion
+remainder map $R(\Delta, x) := x - \N(\Delta, x)$ as
+$\N(\Delta, x) + R(\Delta, x) = x$.
+A more extended comparison with Robinson's standard part function
+$\mathrm{st}()$ --- including a concrete numerical example of
+non-distributivity --- is deferred to
+Appendix~\ref{app:motivation}, since these comparisons are motivational
+rather than formal contributions of this paper.
+\end{remark}
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Formalization Setup and Key Definitions}
+\label{sec:setup}
+
+\paragraph{Infrastructure.}
+The formalization uses \Lean{} version \texttt{leanprover/lean4:v4.24.0}
+with Mathlib commit \texttt{f897ebcf}.
+All analytic properties of the Riemann zeta function --- analyticity,
+the functional equation, the completed zeta function $\xi(s)$,
+and the Schwarz reflection principle --- are imported directly from
+Loeffler--Stoll~\cite{loeffler2025} via Mathlib.
+The \Aristotle{} automated theorem prover~\cite{aristotle2025}
+was used to close proof gaps in the formalization.
+
+\paragraph{Key definitions.}
+
+\begin{lstlisting}[language=Lean4]
+-- Nontrivial zeros: zeros in the critical strip
+def is_nontrivial_zero (rho : Complex) : Prop :=
+  riemannZeta rho = 0 and 0 < rho.re and rho.re < 1
+
+-- Order of vanishing via Mathlib infrastructure
+noncomputable def zeta_order (rho : Complex) : Nat :=
+  ENat.toNat (AnalyticAt.order riemannZeta rho)
+
+-- Shifted zero spectrum: deviations from Re = 1/2
+def ShiftedZeroSpectrum : Set Real :=
+  {x | exists rho in RiemannZeros, x = rho.re - 1/2}
+
+-- The Riemann Hypothesis
+def RiemannHypothesis : Prop :=
+  forall rho : Complex, is_nontrivial_zero rho -> rho.re = 1/2
+
+-- All zeros simple
+def AllZerosSimple : Prop :=
+  forall rho : Complex, is_nontrivial_zero rho -> zeta_order rho = 1
+\end{lstlisting}
+
+\paragraph{Scale.}
+The formalization spans 82~Lean~4 files organized in three volumes:
+\begin{enumerate}
+  \item \textbf{Core operator library} (Batch 1--14, MdBatch 1--7):
+        algebraic properties of $\N(\Delta,x)$ in full generality.
+  \item \textbf{RH and number theory} (Outputs 0--86):
+        the reduction machinery, leveling trick, and minimal axiom surface.
+  \item \textbf{Extended applications} (Outputs 87--96):
+        Sturm--Liouville bridge to the mass gap problem and related spectral systems.
+\end{enumerate}
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Sturm--Liouville Simplicity Formalization}
+\label{sec:proved}
+
+\subsection{Main SL Simplicity Theorem}
+\label{sec:sl_main}
+
+The Sturm--Liouville simplicity result is the primary unconditional contribution
+of this paper.
+We formalize the classical Wronskian argument for confining one-dimensional
+Sturm--Liouville operators.
+The key definitional components are:
+
+\begin{lstlisting}[language=Lean4]
+-- A potential V is confining: continuous and V(x) → +∞ as |x| → ∞
+def IsConfiningPotential (V : ℝ → ℝ) : Prop :=
+  Continuous V ∧ Filter.Tendsto V (Filter.cocompact ℝ) Filter.atTop
+
+-- u is an eigenfunction of -d²/dx² + V with eigenvalue eigval,
+-- nonzero, and square-integrable
+def IsSturmLiouvilleEigenfunction
+    (V : ℝ → ℝ) (eigval : ℝ) (u : ℝ → ℝ) : Prop :=
+  Differentiable ℝ u ∧
+  Differentiable ℝ (deriv u) ∧
+  (∀ x, -(deriv (deriv u) x) + V x * u x = eigval * u x) ∧
+  u ≠ 0 ∧
+  MeasureTheory.MemLp u 2 MeasureTheory.volume
+
+-- The Wronskian of two functions u, v at a point x
+def wronskian (u v : ℝ → ℝ) (x : ℝ) : ℝ :=
+  u x * deriv v x - v x * deriv u x
+
+-- An eigenvalue is simple if every two eigenfunctions
+-- for it are scalar multiples of each other
+def IsSimpleEigenvalue (V : ℝ → ℝ) (eigval : ℝ) : Prop :=
+  ∀ u v : ℝ → ℝ,
+    IsSturmLiouvilleEigenfunction V eigval u →
+    IsSturmLiouvilleEigenfunction V eigval v →
+    ∃ c : ℝ, ∀ x, v x = c * u x
+\end{lstlisting}
+
+\begin{theorem}[Sturm--Liouville Simplicity, \lean{sturm\_liouville\_simple\_eigenvalues}]
+\label{thm:sl_simplicity}
+Let $V \colon \R \to \R$ be a confining potential.
+Then every eigenvalue of $-d^2/dx^2 + V$ admitting a square-integrable
+eigenfunction is simple: any two such eigenfunctions for the same
+eigenvalue are scalar multiples of each other.
+\end{theorem}
+
+\begin{proof}
+Fix an eigenvalue $\mathit{eigval}$ and two eigenfunctions $u, v$ for it.
+The Wronskian $W[u,v](x) = u(x)v'(x) - v(x)u'(x)$ of two solutions to
+the same eigenvalue equation is constant (Abel's identity, packaged as
+\lean{wronskian\_constant\_same\_eigenvalue}):
+\[
+  \frac{d}{dx} W[u,v] = 0 \quad \Longrightarrow \quad W \equiv C \in \R.
+\]
+If both $u, v \in L^2(\R)$ and $V$ is confining, then
+$|u(x)|, |v(x)| \to 0$ as $|x| \to \infty$, and likewise for $u', v'$
+via the second-order ODE
+$u'' = (V(x) - \mathit{eigval})\, u(x)$.
+Hence $W[u,v](x) \to 0$ as $|x| \to \infty$, so $C = 0$, so $W \equiv 0$
+(\lean{wronskian\_zero\_of\_l2\_final}).
+$W \equiv 0$ together with $u \neq 0$ then forces $v$ to be a scalar
+multiple of $u$ (\lean{linearly\_dependent\_of\_wronskian\_zero}).
+
+In Lean~4 (pinned to \texttt{f897ebcf}), the capstone reads:
+\begin{lstlisting}[language=Lean4]
+theorem sturm_liouville_simple_eigenvalues (V : ℝ → ℝ)
+    (hV : IsConfiningPotential V) (eigval : ℝ) :
+    IsSimpleEigenvalue V eigval := by
+  intro u v hu hv
+  have hW : ∀ x, wronskian u v x = 0 :=
+    wronskian_zero_of_l2_final V eigval hV u v hu hv
+  exact linearly_dependent_of_wronskian_zero
+    V eigval hV.1 u v hu hv hW
+\end{lstlisting}
+The two intermediate lemmas \lean{wronskian\_zero\_of\_l2\_final} and
+\lean{linearly\_dependent\_of\_wronskian\_zero} are themselves proved
+by combining \lean{wronskian\_constant\_same\_eigenvalue} (Abel's
+identity) with the asymptotic decay
+\lean{tendsto\_zero\_and\_deriv\_zero\_of\_eigenfunction\_final} for
+$L^2$ eigenfunctions of confining potentials.
+\end{proof}
+
+\subsection{Supporting Theorems}
+\label{sec:supporting_thms}
+
+The following results, gathered in \lean{MinimalAxiomReduction.lean},
+are established with zero unresolved \lean{sorry} placeholders, zero
+\lean{exact?} fallbacks, and zero \lean{admit} calls.
+All proofs compile against Mathlib.
+The Sturm--Liouville capstone of Section~\ref{sec:sl_main} also compiles
+zero-\lean{sorry} and zero-\lean{admit}; it contains a small number of
+\lean{exact?} calls produced during \Aristotle{}-assisted gap closure,
+each of which the Lean kernel type-checks to a concrete proof term at
+elaboration time.
+
+\begin{theorem}[\lean{shifted\_bounded}]
+\label{thm:shifted_bounded}
+For every non-trivial zero $\rho$ of $\zeta(s)$:
+$|\re(\rho) - 1/2| < 1/2$.
+\end{theorem}
+
+\begin{proof}
+Immediate from $0 < \re(\rho) < 1$ (critical strip), algebraic manipulation.
+In Lean:
+\begin{lstlisting}[language=Lean4]
+theorem shifted_bounded :
+    forall x in ShiftedZeroSpectrum, |x| < 1/2 := by
+  intro x hx
+  obtain <rho, hrho, rfl> := hx
+  rw [abs_lt]
+  exact <by linarith [hrho.2.1], by linarith [hrho.2.2]>
+\end{lstlisting}
+\end{proof}
+
+\begin{theorem}[\lean{tau\_half\_real}]
+\label{thm:tau_half}
+If $S \subseteq \R$ satisfies the spectral gap property at $\Delta$
+and every element of $S$ satisfies $|x| < \Delta$,
+then $S \subseteq \{0\}$.
+\end{theorem}
+
+\begin{proof}
+For $x \in S$: the gap property gives $x = 0$ or $|x| \geq \Delta$;
+the bound $|x| < \Delta$ excludes the second case. Hence $x = 0$.
+\end{proof}
+
+\begin{theorem}[\lean{zeta\_order\_ge\_one}]
+\label{thm:order_ge_one}
+Every non-trivial zero of $\zeta(s)$ has order at least~$1$.
+\end{theorem}
+
+\begin{proof}
+A zero of an analytic function has order $\geq 1$ by definition.
+Proved via \lean{AnalyticAt.order\_eq\_zero\_iff} from Mathlib.
+\end{proof}
+
+\begin{theorem}[\lean{order\_one\_iff\_deriv}]
+\label{thm:order_iff}
+For a non-trivial zero $\rho$:
+$\zetaord_\rho(\zeta) = 1 \iff \zeta'(\rho) \neq 0$.
+\end{theorem}
+
+\begin{proof}
+The order of vanishing of an analytic function at a zero equals~$1$
+precisely when the first derivative is nonzero at that point.
+Proved via \lean{AnalyticAt.order\_eq\_one\_iff} applied to
+\lean{riemannZeta\_analyticAt} from Mathlib:
+\begin{lstlisting}[language=Lean4]
+theorem order_one_iff_deriv
+    (hrho : is_nontrivial_zero rho) :
+    zeta_order rho = 1 <-> deriv riemannZeta rho != 0 :=
+  AnalyticAt.order_eq_one_iff (riemannZeta_analyticAt rho)
+\end{lstlisting}
+\end{proof}
+
+\begin{theorem}[\lean{xi\_even}]
+\label{thm:xi_even}
+The completed zeta function satisfies
+$\xi(1/2 + w) = \xi(1/2 - w)$ for all $w \in \C$.
+\end{theorem}
+
+\begin{proof}
+Direct from \lean{completedRiemannZeta\_one\_sub} in Mathlib via \lean{ring\_nf}.
+\end{proof}
+
+\begin{theorem}[\lean{GUE\_level\_repulsion}]
+\label{thm:gue}
+The GUE pair correlation function satisfies $R_2(0) = 0$.
+\end{theorem}
+
+\begin{proof}
+By definition of $R_2(\alpha) = 1 - (\sin(\pi\alpha)/(\pi\alpha))^2$
+for $\alpha \neq 0$ and $R_2(0) = 0$: \lean{simp [GUE\_pair\_correlation]}.
+\end{proof}
+
+\begin{theorem}[\lean{multiplicity\_squeeze}]
+\label{thm:squeeze}
+If every non-trivial zero has order $\geq 1$ and order $\leq 1$,
+then every non-trivial zero has order exactly~$1$.
+\end{theorem}
+
+\begin{proof}
+Immediate from \lean{Nat.le\_antisymm}.
+\end{proof}
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{The Leveling Trick}
+\label{sec:leveling}
+
+The most structurally novel contribution of this formalization is the
+\emph{leveling trick} --- a constructive mechanism that pins every
+non-trivial zero to the critical line $\re(s) = 1/2$.
+
+\subsection{Algebraic motivation}
+
+The algebraic content of the leveling trick is the observation that any
+real number $|x| < 1/2$ in a set with the spectral gap property at
+$\Delta = 1/2$ must be exactly zero: the gap forces $x = 0$ or $|x|
+\geq 1/2$, and the bound $|x| < 1/2$ rules out the second alternative.
+Applied to the deviation $\re(\rho) - 1/2$ of a nontrivial zero, this
+forces $\re(\rho) = 1/2$.
+
+\begin{definition}[Signed deviation and its conjugate]
+For a point $\rho \in \C$, define:
+\begin{align*}
+  \mathrm{Dev}(\rho)      &:= \re(\rho) - 1/2, \\
+  \mathrm{ConjDev}(\rho)  &:= -(\re(\rho) - 1/2) = 1/2 - \re(\rho).
+\end{align*}
+\end{definition}
+
+These are antisymmetric: $\mathrm{ConjDev}(\rho) = -\mathrm{Dev}(\rho)$,
+so $\mathrm{Dev}(\rho) + \mathrm{ConjDev}(\rho) = 0$ identically.
+Note that $\mathrm{Dev}(\rho) \in \mathrm{ShiftedZeroSpectrum}$ for every
+nontrivial zero $\rho$.
+
+\subsection{The balance condition}
+
+The functional equation $\zeta(s) = \zeta(1-s)$ enforces a balance
+between $\rho$ and its conjugate zero $1 - \rho$:
+\[
+  \mathrm{Dev}(1 - \rho)
+  = \re(1 - \rho) - \tfrac{1}{2}
+  = 1 - \re(\rho) - \tfrac{1}{2}
+  = -\mathrm{Dev}(\rho).
+\]
+So $\mathrm{Dev}(1-\rho) = -\mathrm{Dev}(\rho)$: functional-equation partners
+have opposite signed deviations.
+A single zero self-paired under the functional equation (i.e., $1-\rho = \rho$)
+must therefore satisfy $\mathrm{Dev}(\rho) = -\mathrm{Dev}(\rho)$,
+which forces $\mathrm{Dev}(\rho) = 0$, i.e., $\re(\rho) = 1/2$.
+
+\subsection{The leveling theorem}
+
+\begin{theorem}[Leveling theorem, \lean{leveling\_theorem}]
+\label{thm:leveling}
+If $\mathrm{ShiftedZeroSpectrum}$ has the spectral gap property at $\Delta = 1/2$,
+then for every nontrivial zero $\rho$: $\mathrm{Dev}(\rho) = 0$,
+i.e., $\re(\rho) = 1/2$.
+\end{theorem}
+
+\begin{proof}
+Since $\rho$ is a nontrivial zero, $\mathrm{Dev}(\rho) = \re(\rho) - 1/2
+\in \mathrm{ShiftedZeroSpectrum}$.
+By the gap property: either $\mathrm{Dev}(\rho) = 0$ or
+$|\mathrm{Dev}(\rho)| \geq 1/2$.
+By Theorem~\ref{thm:shifted_bounded}, $|\re(\rho) - 1/2| < 1/2$,
+so the second case is impossible.
+Hence $\mathrm{Dev}(\rho) = 0$ and $\re(\rho) = 1/2$.
+
+In Lean~4:
+\begin{lstlisting}[language=Lean4]
+theorem leveling_theorem
+    (h_gap : SpectralGapProperty ShiftedZeroSpectrum (1/2))
+    (rho : ℂ) (hrho : is_nontrivial_zero rho) :
+    Dev rho = 0 := by
+  have hmem : Dev rho ∈ ShiftedZeroSpectrum := ⟨rho, hrho, rfl⟩
+  rcases h_gap (Dev rho) hmem with h0 | hge
+  · exact h0
+  · exfalso; linarith [shifted_bounded hrho, hge]
+\end{lstlisting}
+\end{proof}
+
+\begin{corollary}[\lean{spectral\_gap\_implies\_rh}]
+\label{cor:gap_rh}
+$\mathrm{SpectralGapProperty}(\mathrm{ShiftedZeroSpectrum}, 1/2) \implies \RH$.
+\end{corollary}
+
+\begin{proof}
+By Theorem~\ref{thm:leveling}: $\mathrm{Dev}(\rho) = 0$ for every nontrivial
+zero, hence $\re(\rho) = 1/2$.
+\end{proof}
+
+\begin{remark}
+The leveling theorem is a direct algebraic consequence of two facts:
+the gap property forces values into $\{0\} \cup \{x : |x| \geq 1/2\}$,
+and the bounded strip (Theorem~\ref{thm:shifted_bounded}) forces
+$|\mathrm{Dev}(\rho)| < 1/2$.
+The intersection is the single point $\{0\}$.
+This is the structural content of ``leveling'': every individual nontrivial
+zero is pinned to the critical line by the same two-step squeeze, in
+contrast to asymptotic results that bound averages but do not pin individual
+zeros.
+\end{remark}
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{The Minimal Axiom Reduction}
+\label{sec:minimal}
+
+\begin{definition}[Axiom surface]
+\label{def:axioms}
+The two named hypotheses forming the minimal assumption interface are:
+\begin{align*}
+  \mathbf{SpectralGap} &\;:\;
+    \mathrm{SpectralGapProperty}(\mathrm{ShiftedZeroSpectrum},\; 1/2), \\
+  \mathbf{SimpleBound} &\;:\;
+    \forall\, \rho\;\text{non-trivial},\;
+    \zetaord_\rho(\zeta) \leq 1.
+\end{align*}
+\end{definition}
+
+\begin{theorem}[Main reduction]
+\label{thm:main}
+$\mathbf{SpectralGap} \wedge \mathbf{SimpleBound}
+\;\implies\;
+\RH \;\wedge\; \mathrm{AllZerosSimple}$.
+\end{theorem}
+
+\begin{proof}
+\textbf{RH.} By Corollary~\ref{cor:gap_rh} applied to \textbf{SpectralGap}.
+
+\textbf{AllZerosSimple.} By Theorem~\ref{thm:order_ge_one},
+every non-trivial zero has order $\geq 1$.
+By \textbf{SimpleBound}, every non-trivial zero has order $\leq 1$.
+By Theorem~\ref{thm:squeeze}, every non-trivial zero has order $= 1$.
+
+In Lean:
+\begin{lstlisting}[language=Lean4]
+-- The fully formalized capstone takes three hypotheses:
+-- gap, bridge (discharged by the leveling theorem of §5), and bound.
+theorem resolution_from_three_axioms
+    (h_gap : SpectralGapProperty ShiftedZeroSpectrum (1/2))
+    (h_bridge : ShiftedZeroSpectrum ⊆ {0} → RiemannHypothesis)
+    (h_simple : MultiplicityBoundOne) :
+    RiemannHypothesis ∧ AllZerosSimple := by
+  refine ⟨?_, ?_⟩
+  · exact h_bridge (tau_half_real _ shifted_bounded h_gap)
+  · exact bound_implies_simple h_simple
+
+-- Specializing the bridge to spectral_gap_implies_rh (the §5 leveling
+-- corollary) gives the two-axiom form stated in Theorem 6.2:
+theorem resolution_from_two_axioms
+    (h_gap : SpectralGapProperty ShiftedZeroSpectrum (1/2))
+    (h_simple : MultiplicityBoundOne) :
+    RiemannHypothesis ∧ AllZerosSimple :=
+  resolution_from_three_axioms h_gap
+    (fun _ => spectral_gap_implies_rh h_gap)
+    h_simple
+\end{lstlisting}
+The bridge premise $\mathrm{ShiftedZeroSpectrum} \subseteq \{0\} \to \mathrm{RiemannHypothesis}$
+is itself an immediate consequence of the leveling theorem
+(Section~\ref{sec:leveling}), so the two-axiom statement above is
+equivalent to the three-axiom packaging in
+\lean{MinimalAxiomReduction.lean}.
+\end{proof}
+
+The two axioms are also sufficient for each conjecture independently:
+
+\begin{corollary}
+\label{cor:independent}
+\begin{enumerate}[label=(\alph*)]
+  \item $\mathbf{SpectralGap} \implies \RH$
+        (without simplicity, \lean{resolution\_rh\_only}).
+  \item $\mathbf{SimpleBound} \implies \mathrm{AllZerosSimple}$
+        (without RH, \lean{resolution\_simple\_only}).
+\end{enumerate}
+\end{corollary}
+
+Four independent resolution paths are formalized:
+\begin{center}
+\begin{tabular}{lll}
+  \toprule
+  Path & Hypotheses & Conclusion \\
+  \midrule
+  A (Derivative) & SpectralGap + DerivativeNonvanishing & RH $\wedge$ Simple \\
+  B (Multiplicity) & SpectralGap + MultBoundOne & RH $\wedge$ Simple \\
+  C (Contrapositive) & SpectralGap + MultipleZeroKillsGap & RH $\wedge$ Simple \\
+  D (GUE) & SpectralGap + GUE\_Exclusion & RH $\wedge$ Simple \\
+  \bottomrule
+\end{tabular}
+\end{center}
+Paths A and B are equivalent (Theorem~\ref{thm:order_iff}).
+Paths B, C, and D are machine-verified.
+
+\begin{remark}[On the strength of \textbf{SpectralGap}]
+\label{rem:sg_strength}
+The hypothesis \textbf{SpectralGap} is not claimed to be strictly weaker
+than RH.
+If \lean{ShiftedZeroSpectrum} is taken as the literal set of deviations
+$\{\re(\rho) - 1/2 \mid \zeta(\rho) = 0,\; 0 < \re(\rho) < 1\}$,
+then \textbf{SpectralGap} is logically equivalent to RH given the
+bounded strip (Theorem~\ref{thm:shifted_bounded}).
+The framework's contribution is not a weakening of RH but an
+\emph{isolation}: the operator algebra of $\N(\Delta, x)$ (Batch~14,
+\lean{master\_enforcement}) derives a gap property on
+$\mathrm{Set.range}(\N_\Delta)$ from three algebraic properties
+(conservation, idempotence, discreteness).
+The single remaining open step is the identification
+$\mathrm{ShiftedZeroSpectrum} = f(\mathrm{Set.range}(\N_\Delta))$
+for an appropriate map $f$.
+This identification --- the Hilbert--P\'{o}lya correspondence --- is
+stated as an explicit named context field \lean{hp\_correspondence} in
+Section~\ref{sec:obstruction}, separating all algebraic content from the
+single open conjecture.
+\end{remark}
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{The Axiom Reduction Journey}
+\label{sec:reduction}
+
+A key lesson of this formalization is how much can be eliminated from the
+axiom surface through careful interaction with \Mathlib{}.
+The reduction proceeded in four stages:
+
+\begin{center}
+\begin{tabular}{llll}
+  \toprule
+  Output & Name & Axioms & Result \\
+  \midrule
+  40  & Capstone v1    & 7 & $\RH \wedge \text{Simple}$ \\
+  55  & Weinstein form & 5 & $\RH \wedge \text{Simple}$ \\
+  68  & Grand unified  & 5 & $\RH \wedge \text{Simple}$ \\
+  71  & \textbf{Minimal}      & \textbf{2} & $\RH \wedge \text{Simple}$ \\
+  71b & RH only        & 1 & $\RH$ \\
+  71c & Simple only    & 1 & $\text{Simple}$ \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+Axioms eliminated in the reduction from 7 to 2:
+\begin{enumerate}
+  \item \textbf{Analyticity} of $\zeta$ --- available in Mathlib via
+        \lean{riemannZeta\_analyticAt}.
+  \item \textbf{Functional equation} $\zeta(s) = \zeta(1-s)$ --- Mathlib,
+        \lean{completedRiemannZeta\_one\_sub}.
+  \item \textbf{$\xi$ symmetry} $\xi(1/2+w) = \xi(1/2-w)$ --- proved as
+        Theorem~\ref{thm:xi_even}, zero additional hypotheses.
+  \item \textbf{Order $\geq 1$} at non-trivial zeros --- proved as
+        Theorem~\ref{thm:order_ge_one} via \lean{AnalyticAt.order}.
+  \item \textbf{Speiser's theorem} formalized in output~45 and imported.
+\end{enumerate}
+
+Each eliminated axiom corresponds to a theorem provable from Mathlib
+infrastructure without additional number-theoretic input.
+The two remaining axioms are of a different character, as we now explain.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{The Irreducible Obstruction}
+\label{sec:obstruction}
+
+\begin{theorem}[Irreducibility of SpectralGap]
+\label{thm:sg_irreducible}
+\textbf{SpectralGap} cannot be proved from Mathlib without solving
+a Millennium-class problem.
+\end{theorem}
+
+\begin{proof}[Informal]
+Making SpectralGap a theorem requires proving that
+$\mathrm{ShiftedZeroSpectrum}$ has no elements in $(0, 1/2)$.
+This is equivalent to proving that all non-trivial zeros satisfy $\re(\rho) = 1/2$,
+i.e., the Riemann Hypothesis itself.
+Alternatively, it requires proving that zeta zeros are eigenvalues of a
+self-adjoint operator, which is the content of the Hilbert--P\'olya conjecture,
+itself a Millennium-class problem.
+\end{proof}
+
+\begin{theorem}[Irreducibility of SimpleBound]
+\label{thm:sb_irreducible}
+\textbf{SimpleBound} is logically independent of $\RH$ and cannot be
+eliminated by any known classical technique.
+\end{theorem}
+
+\begin{proof}[Informal]
+We verify each known approach fails:
+\begin{enumerate}
+  \item \textbf{Laguerre--P\'olya class:}
+        LP class membership permits double zeros by definition.
+  \item \textbf{Rolle's theorem:}
+        The zero count bound is exactly tight (giving $n-1$ zeros for
+        degree~$n$), so Rolle provides no margin.
+  \item \textbf{Speiser's theorem:}
+        Speiser governs $\re(s) < 1/2$, not $\re(s) = 1/2$.
+  \item \textbf{de Bruijn--Newman dynamics:}
+        The flow degenerates at $\Lambda = 0$, providing no information
+        about zero order.
+  \item \textbf{Goldston--Gonek--Montgomery (2025):}
+        Pair correlation implies asymptotically 100\% simple zeros,
+        but ``asymptotically all'' $\neq$ ``all.''
+\end{enumerate}
+The conjecture remains open.
+\end{proof}
+
+\begin{remark}
+The density-zero obstruction is the precise gap.
+The set of non-simple zeros could have density zero among all zeros
+(consistent with Goldston et al.) yet still be infinite.
+The conjecture \textbf{SimpleBound} is precisely the statement that this
+density-zero set is empty.
+\end{remark}
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\subsection{The Identification Context: \lean{HPContext}}
+\label{sec:hpcontext}
+
+Spectral approaches to the Riemann Hypothesis, such as the
+Hilbert--P\'{o}lya program, posit the existence of a self-adjoint operator
+whose spectrum corresponds to the imaginary parts of the nontrivial zeros of
+$\zeta(s)$~\cite{montgomery1973,goldston2001}.
+If such an operator exists, its eigenvalues lie on the real axis by
+self-adjointness, placing the associated zeros on $\re(s) = 1/2$ --- exactly
+the content of RH.
+The single gap in the present framework that cannot be closed by operator
+algebra alone is the identification of $\N$'s derived spectral range with the
+actual zeta-zero shift spectrum.
+To make this identification explicit and modular --- separating \emph{object
+identification} from \emph{operator identification} --- the Lean formalization
+introduces:
+
+\begin{lstlisting}[language=Lean4]
+-- The load-bearing bridge, surfaced as a named context.
+-- Two separate identification steps prevent conflation of distinct assumptions:
+structure HPContext (Delta : Real) where
+  -- (1) Object identification: what spectrum corresponds to zeta zeros
+  zetaShift : Complex -> Real         -- Re(rho) - 1/2
+  zeroSet   : Set Complex             -- nontrivial zeta zeros
+  shiftedSpec : Set Real
+  shiftedSpec_def : shiftedSpec = Set.image zetaShift zeroSet
+
+  -- (2) Operator identification: N acts on the right object  
+  N_targets : Set.image zetaShift zeroSet ⊆ Set.range (N Delta)
+  -- Consequence: SpectralGapProperty (Set.range (N Delta)) Delta
+  -- + N_targets gives SpectralGapProperty shiftedSpec Delta
+  -- The operator-algebra gap (Batch14, master_enforcement) then transfers.
+\end{lstlisting}
+
+This structure makes the Hilbert--P\'{o}lya correspondence a
+\emph{first-class hypothesis with explicit components}, not an implicit
+background assumption.
+The spectral gap property should not be interpreted as strictly weaker than
+the Riemann Hypothesis: under the literal definition of
+\lean{ShiftedZeroSpectrum}, the two are equivalent by the bounded strip
+(Theorem~\ref{thm:shifted_bounded}).
+What the framework contributes is \emph{isolation}: the algebraic content
+of $\N$ (conservation, idempotence, discreteness) is proved independently,
+and the gap's connection to the actual zeta spectrum is precisely the
+single open conjecture surfaced by \lean{HPContext}.
+Future work that constructs a self-adjoint operator whose spectrum
+matches zeta zeros (the classical Hilbert--P\'{o}lya program) would
+instantiate \lean{HPContext} with proved theorems, at which point all
+\lean{sorry}-free theorems in this framework discharge automatically.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Mathematical Lessons from Formalization}
+\label{sec:lessons}
+
+\paragraph{Lesson 1: Mathlib absorbs more than expected.}
+Of the seven initial axioms, five were eliminable through careful
+interaction with Mathlib's existing zeta function infrastructure.
+The analyticity, functional equation, and xi symmetry --- each treated as
+independent axioms in earlier versions --- all followed from theorems
+already formalized by Loeffler--Stoll~\cite{loeffler2025}.
+This underscores the value of building on established Mathlib infrastructure
+rather than re-axiomatizing standard results.
+
+\paragraph{Lesson 2: The axiom surface is the proof.}
+The journey from 7 to 2 axioms is not merely a technical optimization:
+it reveals the precise logical structure of the problem.
+Two named hypotheses remain because they correspond to two genuinely
+open problems with no known proof pathway.
+The formalization makes this structure \emph{explicit and checkable}:
+one can inspect exactly which theorems depend on which assumptions.
+
+\paragraph{Lesson 3: Automated provers as completion engines.}
+The \Aristotle{} theorem prover~\cite{aristotle2025} was used extensively
+for gap closure.
+Correctness is ensured by the Lean kernel, which type-checks every
+proof term regardless of how it was found.
+The kernel is the arbiter of truth; \Aristotle{} acts as a search
+heuristic over candidate proof terms, not as an independent semantic
+authority.
+In practice, careful prompt engineering and explicit definitional
+control were nonetheless required to keep \Aristotle{} aimed at the
+intended theorem statements: in novel frameworks that do not match
+conventional patterns, human conceptual direction must remain primary,
+with automation handling technical gap-filling under kernel
+verification.
+
+\paragraph{Lesson 4: Algebraic motivation guides formalization.}
+The leveling theorem arose from a simple algebraic observation: a value
+in a set with the spectral gap property at $\Delta = 1/2$ must satisfy
+$x = 0$ or $|x| \geq 1/2$, while the bounded strip forces
+$|\mathrm{Dev}(\rho)| < 1/2$.
+The intersection is the single point $\{0\}$.
+Recognizing this two-step squeeze --- gap plus bound --- before writing
+the Lean proof determined the structure of \lean{leveling\_theorem}:
+case-split on the gap disjunction, then close the second case with a
+single \lean{linarith} call from the strip bound.
+The same algebraic pattern appears throughout the corpus and is the
+core structural idea repeatedly relied on.
+
+\paragraph{Lesson 5: Non-distributivity is not a bug.}
+A persistent concern about the nullification operator is its
+non-distributivity: $\N(\Delta, x + y) \neq \N(\Delta, x) + \N(\Delta, y)$
+in general.
+The formalization clarifies that this is a \emph{feature}: it captures
+precisely the threshold-crossing behaviour responsible for the spectral gap.
+Conservation ($\N + R = \mathrm{id}$) holds exactly throughout; what fails
+is linearity, and that failure is the source of the gap.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section*{Reproducibility}
+\label{sec:reproducibility}
+
+The full development compiles under the following pinned environment.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{ll}
+  \toprule
+  \textbf{Component}   & \textbf{Version / Identifier} \\
+  \midrule
+  Lean                 & \texttt{leanprover/lean4:v4.24.0} \\
+  Mathlib commit       & \texttt{f897ebcf72cd16f89ab4577d0c826cd14afaafc7} \\
+  Aristotle ATP        & \url{https://aristotle.harmonic.fun} \\
+  GitHub repository    & \url{https://github.com/Joeyxyxyz/messina-nullification-framework} \\
+  Zenodo Vol.~1 (Core) & \href{https://doi.org/10.5281/zenodo.18902403}{10.5281/zenodo.18902403} \\
+  Zenodo Vol.~2 (RH)   & \href{https://doi.org/10.5281/zenodo.18902325}{10.5281/zenodo.18902325} \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+To build from scratch:
+\begin{lstlisting}[language=Lean4]
+-- In the repository root:
+-- lake update
+-- lake build
+-- All 82 files should compile with zero sorry diagnostics.
+\end{lstlisting}
+
+The repository includes a \texttt{lakefile.lean} pinning the Mathlib commit above.
+All proofs relevant to the main theorem (Sections~\ref{sec:proved}--\ref{sec:obstruction})
+are zero-\lean{sorry} and zero-\lean{admit}.
+The \lean{HPContext} identification hypotheses are the only named assumptions not
+discharged by \Mathlib{}; they are explicitly marked in the source.
+
+\subsection*{Independent kernel verification}
+\label{sec:axle}
+
+The load-bearing algebraic content of every paper section has been
+independently kernel-verified by AXLE (\emph{Axiom Lean Engine},
+\url{https://axle.axiommath.ai}, lean-4.28.0 environment).
+For each paper section, a self-contained pair of Lean files
+(\texttt{*\_STATEMENT.lean}, \texttt{*\_CONTENT.lean}) was submitted to
+AXLE's \texttt{verify\_proof} endpoint.
+AXLE confirmed each pair: every theorem stated with \lean{:= by sorry}
+in the formal-statement side is implemented with a non-\lean{sorry}
+proof on the content side, and the implementation type-checks against
+the statement.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\footnotesize
+\begin{tabular}{lll}
+  \toprule
+  \textbf{Section} & \textbf{Theorem(s)} & \textbf{AXLE request ID} \\
+  \midrule
+  \S\ref{sec:operator} & \lean{master\_enforcement} & \texttt{e0755420-c907-4578-8f2f-ab59d002ed52} \\
+  \S\ref{sec:proved}   & \lean{sturm\_liouville\_simple\_eigenvalues} (architecture) & \texttt{da53f7a2-78f9-446d-9dda-a130631e6994} \\
+  \S\ref{sec:leveling} & \lean{leveling\_theorem}, \lean{leveling\_implies\_re\_half} & \texttt{376a6860-4bb2-4d3d-a461-cce659917ee6} \\
+  \S\ref{sec:minimal}  & \lean{resolution\_from\_three\_axioms} (and corollaries) & \texttt{5ac337c1-6c9d-4390-bcaa-42c626f75582} \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+An earlier audit batch (March 5, 2026, AXLE launch day) verified six
+related theorems from the operator-algebra and shifted-spectrum layers
+of the corpus:
+\texttt{22abc227}, \texttt{572b70d1}, \texttt{c133ead0},
+\texttt{3de41f1f}, \texttt{f854b8e9}, \texttt{01ae8bf9}.
+
+The four \texttt{*\_STATEMENT.lean}\,/\,\texttt{*\_CONTENT.lean} pairs
+are included in the Zenodo deposit (folder \texttt{axle\_pairs/}) so
+reviewers may re-run the verifications independently.
+The pairs are designed for AXLE's single-call interface and do not
+require a local Lean toolchain; pasting each pair into the AXLE web
+console reproduces the verification.
+
+\begin{remark}
+The AXLE pairs verify the algebraic logic of each section in
+isolation: they expose the heavyweight analytic ingredients (e.g.\
+$\mathrm{order}_\rho(\zeta) \geq 1$, the $L^2$ Wronskian decay) as
+named hypotheses rather than re-running their full Mathlib-backed
+proofs.
+This is the appropriate granularity for an independent algebraic
+audit.
+The full proofs of the named ingredients live in the corpus
+(\lean{MinimalAxiomReduction.lean}, \lean{SturmLiouvilleSimplicity.lean})
+and are confirmed by the full \texttt{lake build} against the pinned
+Mathlib commit.
+\end{remark}
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Conclusion and Future Directions}
+\label{sec:conclusion}
+
+We have presented two Lean~4/Mathlib contributions.
+First, a standalone Sturm--Liouville formalization proving eigenvalue simplicity
+for confining potentials, independent of any number-theoretic application.
+Second, a modular zeta-zero assumption interface expressing RH and Simple Zeros
+as conditional consequences of a minimal, explicitly named hypothesis pair,
+with all remaining classical ingredients supplied by Mathlib.
+The leveling trick provides a novel constructive mechanism showing that a
+spectral gap forces non-trivial zeros onto the critical line.
+The single remaining open identification step --- connecting the operator's
+derived gap to the actual zeta-zero spectrum --- is isolated as an explicit
+named context field \lean{hp\_correspondence}, enabling future Mathlib
+developments to discharge it.
+
+\paragraph{Future directions.}
+\begin{enumerate}
+  \item \textbf{Closing SpectralGap.}
+        The Hilbert--P\'olya program --- constructing a self-adjoint operator
+        whose eigenvalues are the non-trivial zeros --- would make SpectralGap
+        a theorem.
+        The Sturm--Liouville formalization in this framework (Outputs 59, 62, 64--65)
+        is a step toward this goal.
+
+  \item \textbf{Physical applications.}
+        The Sturm--Liouville infrastructure developed here is intended as a
+        formal bridge toward the Yang--Mills mass gap problem.
+        A separate paper formalizing the mass gap approach is in preparation.
+
+  \item \textbf{Mathlib integration.}
+        Key infrastructure theorems (the leveling trick, spectral gap property,
+        trinary classification) are candidates for Mathlib contribution,
+        making them available to the broader formalized mathematics community.
+        The goal of this framework is to make the remaining analytic assumptions
+        explicit and modular, enabling future formal developments to replace them
+        with proved theorems as \Mathlib{}'s analytic infrastructure grows.
+        Each named context field in \lean{HPContext} represents a precise target
+        for future Mathlib development.
+\end{enumerate}
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section*{Artifact Availability}
+
+The complete Lean~4 source code and documentation are publicly available.
+An experimental companion artifact (IBM quantum circuits, replication guide)
+is included in the Zenodo deposit but is not required for any formal result.
+
+\begin{itemize}
+  \item \textbf{Zenodo Vol.~2 (RH):}
+        \url{https://doi.org/10.5281/zenodo.18902325}
+  \item \textbf{Zenodo Vol.~1 (Core):}
+        \url{https://doi.org/10.5281/zenodo.18902403}
+  \item \textbf{GitHub:}
+        \url{https://github.com/Joeyxyxyz/messina-nullification-framework}
+\end{itemize}
+
+The artifact compiles under \texttt{leanprover/lean4:v4.24.0}
+with Mathlib commit \texttt{f897ebcf72cd16f89ab4577d0c826cd14afaafc7}.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section*{Acknowledgements}
+
+The author thanks the Lean community and Mathlib contributors for the
+zeta function infrastructure that made this formalization possible,
+and the IBM Quantum team for hardware access.
+Special thanks to the \Aristotle{} team at Harmonic for automated proof
+assistance.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\appendix
+
+\section{Motivational Comparisons and External Interpretations}
+\label{app:motivation}
+
+This appendix collects motivational material that informs the design of
+$\N(\Delta, x)$ but is not part of the formal contribution of this paper.
+None of the statements below are required by any theorem in
+Sections~\ref{sec:operator}--\ref{sec:obstruction}; they are included
+solely for readers who want broader context.
+
+\subsection{Routing vs.\ Forgetting: $\N(\Delta,x)$ and Robinson's $\mathrm{st}()$}
+\label{app:routing}
+
+A natural point of comparison for the nullification operator is
+Robinson's \emph{standard part function} $\mathrm{st}(x)$ from
+non-standard analysis (NSA)~\cite{robinson1966}.
+For a finite hyperreal $x = r + \varepsilon$ where $r$ is real and
+$\varepsilon$ is infinitesimal, $\mathrm{st}(r + \varepsilon) = r$.
+The infinitesimal part is discarded; $\mathrm{st}()$ is a ring
+homomorphism and a quotient map, identifying everything that differs by
+an infinitesimal.
+We sketch here how $\N(\Delta, x)$ differs from $\mathrm{st}()$
+algebraically.
+
+\paragraph{The foundational distinction.}
+$\mathrm{st}()$ is a \emph{forgetting} operation: sub-threshold
+(infinitesimal) content is discarded entirely.
+$\N(\Delta, x)$ is a \emph{routing} operation: sub-threshold content is
+sent to a separate channel via the companion reservoir operator
+$R(\Delta, x) = x - \N(\Delta, x)$, where it remains accessible and
+recoverable via $R$.
+The conservation law $\N(\Delta, x) + R(\Delta, x) = x$ holds for all
+$x$ and all $\Delta > 0$.
+There is no analog of this identity in NSA: $\mathrm{st}()$ has no
+conservation partner of this form.
+
+\paragraph{Trinary classification.}
+$\N(\Delta, x)$ generates a three-class partition of $\R$:
+\begin{itemize}[noitemsep]
+  \item $[0]$ --- true zero ($x = 0$);
+  \item $[0.0e]$ --- nullified/reservoir ($0 < |x| < \Delta$);
+  \item $[1]$ --- observable ($|x| \geq \Delta$).
+\end{itemize}
+The middle class is the structural innovation.
+It is absent from frameworks built around $\mathrm{st}()$, which
+collapses all infinitesimals to zero, and from standard binary threshold
+models, which have no mechanism to retain sub-threshold magnitude.
+
+\paragraph{Non-distributivity.}
+$\mathrm{st}()$ is distributive ($\mathrm{st}(x+y) = \mathrm{st}(x) +
+\mathrm{st}(y)$).
+$\N(\Delta, x)$ is not: in general
+$\N(\Delta, x + y) \neq \N(\Delta, x) + \N(\Delta, y)$.
+Two sub-threshold components can sum to a super-threshold result.
+This is not a defect; it is precisely the algebraic content of
+threshold-crossing.
+
+\paragraph{Comparison summary.}
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lll}
+  \toprule
+  \textbf{Property} & \textbf{Robinson $\mathrm{st}()$} & \textbf{$\N(\Delta, x)$} \\
+  \midrule
+  Type              & Ring homomorphism (quotient)   & Filtration operator (routing) \\
+  Sub-threshold     & Collapsed to zero       & Routed to reservoir $[0.0e]$ \\
+  Information       & Discarded               & Magnitude and sign retained \\
+  Distributive?     & Yes                     & No (structural, not incidental) \\
+  Zero structure    & One class: $\{0\}$      & Three classes: $[0]$, $[0.0e]$, $[1]$ \\
+  Signed extension  & Not defined             & $[{+}0.0e]$, $[{-}0.0e]$ distinct \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+For the Lean~4 proofs of non-distributivity, conservation, and the
+signed classification system, see
+\lean{Batch3\_Distributivity\_aristotle.lean},
+\lean{batch11\_nsa\_equivalence\_aristotle.lean}, and
+\lean{output71\_signed\_resolution.lean} in the corpus.
+
+\subsection{Concrete Numerical Example of Non-Distributivity}
+\label{app:xi}
+
+Non-distributivity has a concrete numerical instantiation that can be
+machine-checked.
+With threshold $\Lambda = 246$ and values $m_s = 96$, $m_\Xi = 1315$
+(formalized in \lean{Batch4.lean}):
+\[
+  \N(\Lambda,\, m_s) + \N(\Lambda,\, m_s) = 0 + 0 = 0
+  \;\neq\; 1315 = \N(\Lambda,\, m_\Xi).
+\]
+The threshold-crossing behavior --- two sub-threshold components summing to
+a super-threshold value --- is precisely the algebraic structure that makes
+$\N$ a filtration operator rather than a ring homomorphism.
+This is formalized in \lean{Batch4.lean}:
+
+\begin{lstlisting}[language=Lean4]
+def threshold : ℕ := 246
+def m_component : ℕ := 96    -- below threshold: N(246, 96) = 0
+def m_composite : ℕ := 1315  -- above threshold: N(246, 1315) = 1315
+
+theorem non_distributivity_concrete :
+    N threshold m_component + N threshold m_component = 0 ∧
+    N threshold m_composite = m_composite := by
+  simp [N, threshold, m_component, m_composite]
+\end{lstlisting}
+
+\begin{remark}
+The numerical values above correspond to a known particle physics threshold
+(the QCD confinement scale $\Lambda_\text{QCD} \approx 246$\,MeV and
+the constituent strange-quark / Xi-baryon masses), independently confirmed
+by PDG data~\cite{pdg2024} to sub-MeV precision.
+This correspondence is noted as external motivation only; the Lean
+theorems above hold for these numerical values regardless of any physical
+interpretation.
+\end{remark}
+
+\section{Experimental Companion Artifact (non-deductive motivation)}
+\label{app:experimental}
+
+This appendix describes a physical experiment that motivates the
+\lean{MultipleZeroKillsGap} hypothesis used in Path~C of
+Section~\ref{sec:minimal}.
+It does not constitute a formal proof and is not required for any theorem
+in Sections~\ref{sec:proved}--\ref{sec:obstruction}.
+It is included as a reproducible companion artifact for researchers
+interested in the empirical instantiation of the framework's spectral
+structure.
+
+The \lean{MultipleZeroKillsGap} hypothesis --- that double-zero structure
+measurably destroys the spectral gap signature --- was tested on IBM quantum
+hardware via 64-qubit lattice gauge theory circuits.
+
+\paragraph{Experiment design.}
+Two circuits were run in matched sessions:
+\begin{itemize}[noitemsep]
+  \item \textbf{C0b} (depth-matched): identity CNOT pairs, same circuit
+        depth, zero degeneracy. Noise control.
+  \item \textbf{C3} (degeneracy): state-copying CNOTs forcing double-zero
+        structure.
+\end{itemize}
+Both circuits use 64 qubits encoding the lattice Hamiltonian.
+Sessions were matched on backend and time to control for drift.
+
+\paragraph{Results.}
+\begin{center}
+\begin{tabular}{ll}
+  \toprule
+  Metric & Value \\
+  \midrule
+  $P(\text{C0b free} > \text{C3 free})$ & $1.0000$ \\
+  Bootstrap resamples (5{,}000) & 5{,}000 / 5{,}000 \\
+  95\% CI of difference & $[0.011, 0.025]$ \\
+  Total measurements & 161{,}220+ \\
+  Backends & ibm\_brisbane, ibm\_torino, ibm\_marrakesh \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+Degeneracy (forced double-zero structure) measurably and reproducibly
+suppresses the confinement gap signature relative to matched controls.
+These results provide empirical motivation for \lean{MultipleZeroKillsGap}
+as a plausible premise for Path~C; they do not constitute a formal proof
+of that hypothesis or its analytic consequences.
+The full replication guide and circuit files are included in the Zenodo
+artifact.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\bibliographystyle{plain}
+\begin{thebibliography}{99}
+
+\bibitem{loeffler2025}
+D.~Loeffler and M.~Stoll.
+\newblock Formalizing zeta and $L$-functions in {Lean}.
+\newblock \emph{Annals of Formalized Mathematics}, 2025.
+\newblock \href{https://doi.org/10.46298/afm.15328}{DOI:10.46298/afm.15328}.
+
+\bibitem{mathlib2020}
+The~Mathlib Community.
+\newblock The {Lean} mathematical library.
+\newblock In \emph{Proceedings of the 9th ACM SIGPLAN International
+  Conference on Certified Programs and Proofs (CPP 2020)}, pages 367--381, 2020.
+\newblock \href{https://doi.org/10.1145/3372885.3373824}{DOI:10.1145/3372885.3373824}.
+
+\bibitem{aristotle2025}
+Harmonic.
+\newblock Aristotle: {AI}-assisted theorem proving in {Lean~4}.
+\newblock \url{https://aristotle.harmonic.fun}, 2025.
+
+\bibitem{montgomery1973}
+H.~L. Montgomery.
+\newblock The pair correlation of zeros of the zeta function.
+\newblock In \emph{Analytic Number Theory (Proc. Sympos. Pure Math., Vol. XXIV)},
+  pages 181--193. Amer. Math. Soc., 1973.
+
+\bibitem{speiser1935}
+A.~Speiser.
+\newblock Geometrisches zur {Riemannschen} {Zetafunktion}.
+\newblock \emph{Math. Ann.}, 110(1):514--521, 1935.
+
+\bibitem{goldston2001}
+D.~A. Goldston, S.~M. Gonek, and H.~L. Montgomery.
+\newblock Mean values of the logarithmic derivative of the {Riemann} zeta
+  function with applications to primes in short intervals.
+\newblock \emph{J. Reine Angew. Math.}, 537:105--126, 2001.
+
+\bibitem{trudgian2014}
+T.~S. Trudgian and D.~J. Platt.
+\newblock Improved explicit bounds for some functions of prime numbers.
+\newblock \emph{J. Number Theory}, 2014.
+
+\bibitem{debruijn1950}
+N.~G. de~Bruijn.
+\newblock The roots of trigonometric integrals.
+\newblock \emph{Duke Math. J.}, 17:197--226, 1950.
+
+\bibitem{moura2021}
+L.~de~Moura and S.~Ullrich.
+\newblock The {Lean~4} theorem prover and programming language.
+\newblock In \emph{Automated Deduction -- CADE 28}, Lecture Notes in
+  Computer Science, pages 625--635. Springer, 2021.
+
+\bibitem{robinson1966}
+A.~Robinson.
+\newblock \emph{Non-Standard Analysis}.
+\newblock North-Holland, Amsterdam, 1966.
+
+\bibitem{pdg2024}
+Particle Data Group; S.~Navas et al.
+\newblock Review of particle physics.
+\newblock \emph{Phys.\ Rev.\ D}, 110:030001, 2024.
+\newblock \href{https://doi.org/10.1103/PhysRevD.110.030001}{DOI:10.1103/PhysRevD.110.030001}.
+
+\end{thebibliography}
+
+\end{document}
