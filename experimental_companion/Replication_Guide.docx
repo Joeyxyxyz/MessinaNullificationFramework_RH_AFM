@@ -1,0 +1,368 @@
+**Replication Guide**
+
+MultipleZeroKillsGap Experiment
+
+64-Qubit Lattice Gauge Theory on IBM Quantum Hardware
+
+Joseph Messina --- February 12, 2026
+
+*This guide contains everything needed to independently reproduce the
+experiment.*
+
+*No prior knowledge of the theoretical framework is required.*
+
+**1. Quick Start Checklist**
+
+You need:
+
+-   An IBM Quantum account (free tier works, premium gives faster queue
+    times)
+
+-   Access to a 64+ qubit backend (Brisbane, Torino, Marrakesh, Fez, or
+    equivalent)
+
+-   Python 3.8+ with NumPy installed
+
+-   The three QASM files provided with this guide
+
+-   The analysis script (analyze_path_d_64q.py)
+
+Total time: \~30 minutes of active work plus queue wait time. Each
+circuit run takes 8,061 shots and typically completes in under 5 minutes
+of QPU time.
+
+**2. Required Files**
+
+  ---------------------------------- ----------- ---------------------------------
+  **File**                           **Type**    **Purpose**
+
+  circuit0_baseline_64q.qasm         QASM        Pure baseline --- confining
+                                                 Hamiltonian, no modification
+
+  circuit0b_depth_matched_64q.qasm   QASM        Noise control --- identity CNOT
+                                                 pairs, same depth, zero
+                                                 degeneracy
+
+  circuit3_degeneracy_64q.qasm       QASM        Degeneracy test --- state-copying
+                                                 CNOTs force double zeros
+
+  analyze_path_d_64q.py              Python      Analysis script --- computes
+                                                 correlations, mass gaps,
+                                                 comparisons
+
+  output56_PathD_v2.lean             Lean 4      Formal verification --- 21
+                                                 theorems in the proof chain
+  ---------------------------------- ----------- ---------------------------------
+
+**3. Run Protocol**
+
+**3.1 Circuit Submission**
+
+For a valid comparison, Circuit 0b and Circuit 3 MUST run on the same
+backend in the same session. Circuit 0 can run separately.
+
+**Minimum experiment:** Run C0b and C3 on one backend (2 runs). Compare
+free components.
+
+**Recommended experiment:** Run C0b and C3 on 3+ backends (6+ runs).
+Enables cross-backend validation.
+
+**Full replication:** Match our dataset with 4 C0b + 7 C3 + 3 C0 runs
+across multiple backends.
+
+Step-by-step:
+
+1.  Log into IBM Quantum (quantum.ibm.com)
+
+2.  Select a 64+ qubit backend. Navigate to the Quantum Composer or use
+    the Qiskit API.
+
+3.  Upload or paste circuit0b_depth_matched_64q.qasm. Set shots to 8061.
+    Submit.
+
+4.  IMMEDIATELY submit circuit3_degeneracy_64q.qasm on the SAME backend,
+    same session, 8061 shots.
+
+5.  Wait for both jobs to complete. Download the result JSON files.
+
+6.  Repeat steps 2--5 on additional backends for cross-validation.
+
+7.  Optionally run circuit0_baseline_64q.qasm to establish the pure
+    baseline.
+
+**3.2 Critical Requirements**
+
+-   8061 shots per run (matches our experimental parameters)
+
+-   C0b and C3 on the SAME backend, same session (eliminates calibration
+    drift)
+
+-   Do NOT modify the QASM files (the ONLY difference between C0b and C3
+    is Step 1.5)
+
+-   64+ qubit backends only (the circuit uses qubits 0--63)
+
+**4. Analysis Procedure**
+
+**4.1 Running the Analysis Script**
+
+Edit the file paths at the top of analyze_path_d_64q.py to point to your
+downloaded JSON files:
+
+> BASELINE_FILES = \[
+>
+> \"your_c0_result.json\", \# Optional
+>
+> \]
+>
+> DEGENERACY_FILES = \[
+>
+> \"your_c3_result_1.json\",
+>
+> \"your_c3_result_2.json\",
+>
+> \]
+
+Run: python3 analyze_path_d_64q.py
+
+The script outputs correlations, significance levels, mass gaps, and
+grouped comparisons.
+
+**4.2 Manual Verification (No Script Needed)**
+
+If you prefer to verify by hand, the core computation is simple:
+
+> For each shot (16-bit binary string):
+>
+> For each component k = 0..7:
+>
+> bit_A = bit at position k (site 0,0)
+>
+> bit_B = bit at position k+8 (site 1,0)
+>
+> contribution = (-1)\^(bit_A + bit_B)
+>
+> Correlation_k = average of all contributions for component k
+
+IBM returns results as hex-encoded samples. Each sample is a 16-bit
+value. The least significant bit is c\[0\] (qubit 0, component 0 of site
+(0,0)). Bit 8 is c\[8\] (qubit 32, component 0 of site (1,0)).
+
+**4.3 What To Look For**
+
+The primary metric is the FREE COMPONENT average: mean of
+\|correlation\| for components 4, 5, 6, 7. These components receive ZERO
+extra gates in either C0b or C3.
+
+**If C0b_free \> C3_free:** Degeneracy destroys confinement. Supports
+MultipleZeroKillsGap.
+
+**If C0b_free ≈ C3_free:** No degeneracy effect detected. Inconclusive.
+
+**If C0b_free \< C3_free:** Degeneracy enhances confinement. Contradicts
+conjecture.
+
+Secondary metric: the ASYMMETRY. Compute (forced avg) − (free avg) for
+both circuits. If C3 shows higher asymmetry (forced up, free down), this
+is the signature of degeneracy propagation versus symmetric noise.
+
+**5. Bootstrap Analysis**
+
+For publication-quality statistics, pool all shots from each circuit
+type and bootstrap:
+
+> import numpy as np
+>
+> def bootstrap_free_component(bitstrings, n_boot=5000):
+>
+> N = len(bitstrings)
+>
+> \# Parse to array: each row = 16 bits
+>
+> arr = np.array(\[\[int(bs\[-(k+1)\]) for k in range(16)\]
+>
+> for bs in bitstrings\])
+>
+> results = \[\]
+>
+> for \_ in range(n_boot):
+>
+> idx = np.random.choice(N, N, replace=True)
+>
+> sample = arr\[idx\]
+>
+> corr = np.zeros(8)
+>
+> for k in range(8):
+>
+> corr\[k\] = np.mean((-1)\*\*(sample\[:,k\] + sample\[:,k+8\]))
+>
+> free_avg = np.mean(np.abs(corr\[4:8\]))
+>
+> results.append(free_avg)
+>
+> return np.array(results)
+>
+> \# Compare:
+>
+> boot_c0b = bootstrap_free_component(c0b_shots)
+>
+> boot_c3 = bootstrap_free_component(c3_shots)
+>
+> p_value = np.mean(boot_c0b \> boot_c3)
+>
+> print(f\'P(C0b \> C3) = {p_value:.4f}\')
+
+Our result: P = 1.0000 (5000/5000 resamples) with 95% CI of difference
+\[0.011, 0.025\].
+
+**6. Original Experimental Data**
+
+For direct comparison, here are the IBM job IDs from our experiment:
+
+**6.1 Circuit 0 (Pure Baseline) --- 3 Runs**
+
+  ---------------------------------------- --------------- ---------------
+  **Job ID**                               **Backend**     **Free (4-7)**
+
+  job-d671lchv6o8c73d4t87g                 Fez             0.1283
+
+  job-d671ln0qbmes739eqe2g                 Fez             0.0804
+
+  job-d671lvhv6o8c73d4t8rg                 Fez             0.1188
+  ---------------------------------------- --------------- ---------------
+
+**6.2 Circuit 0b (Depth-Matched Control) --- 4 Runs**
+
+  ---------------------------------------- --------------- ---------------
+  **Job ID**                               **Backend**     **Free (4-7)**
+
+  job-d672oplbujdc73cvdgog                 Fez             0.0924
+
+  job-d672u0pv6o8c73d4v010                 Fez             0.0994
+
+  job-d6733tgqbmes739eseeg                 Torino/Mar      0.1094
+
+  job-d673475bujdc73cve1og                 Torino/Mar      0.0540
+  ---------------------------------------- --------------- ---------------
+
+**6.3 Circuit 3 (Degeneracy) --- 7 Runs**
+
+  ---------------------------------------- --------------- ---------------
+  **Job ID**                               **Backend**     **Free (4-7)**
+
+  job-d671md8qbmes739eqerg                 Fez             0.1045
+
+  job-d671mjtbujdc73cvc4fg                 Fez             0.0429
+
+  job-d671msbe4kfs73d1ar20                 Fez             0.0672
+
+  job-d672q4pv6o8c73d4upm0                 Fez             0.0317
+
+  job-d672tagqbmes739es4f0                 Fez             0.0871
+
+  job-d67350be4kfs73d1cr2g                 Torino/Mar      0.0609
+
+  job-d6735aje4kfs73d1crd0                 Torino/Mar      0.0909
+  ---------------------------------------- --------------- ---------------
+
+**6.4 Summary Statistics**
+
+  ----------------- ----------- ------------- ------------- ---------------
+  **Circuit**       **Runs**    **Free Mean** **Free Std**  **Total Shots**
+
+  C0 (Baseline)     3           0.1091        ±0.0254       24,183
+
+  C0b (Control)     4           0.0888        ±0.0242       32,244
+
+  C3 (Degeneracy)   7           0.0693        ±0.0265       56,427
+  ----------------- ----------- ------------- ------------- ---------------
+
+**7. Expected Results & Troubleshooting**
+
+**7.1 What You Should See**
+
+-   C0 baseline: 5--8 of 8 components above 3σ (0.033). All correlations
+    positive. This confirms the Hamiltonian produces confinement.
+
+-   C0b control: Similar to C0 but with slightly reduced signal due to
+    extra gate noise. Free components should be 0.05--0.12.
+
+-   C3 degeneracy: Free components (4--7) lower than C0b by 15--40%.
+    Forced components (0--3) may appear stable or elevated due to
+    artificial CNOT correlations.
+
+**7.2 Common Issues**
+
+**All correlations near zero:** Check that you used a 64+ qubit backend.
+The circuit requires qubits 0--63. A smaller backend will produce
+compilation errors or noise.
+
+**Inconsistent results across backends:** Normal. Individual backend
+calibration varies significantly. Pool shots across multiple runs for
+stable statistics. Our run-level standard deviation was \~0.025.
+
+**C3 appears stronger than C0b on one backend:** Can happen due to
+calibration. The effect is statistical --- it appears when pooling
+across backends and shots. Single-backend comparisons may not be
+decisive.
+
+**Negative correlations:** Occasional negative values on individual
+components are normal noise fluctuations. The average across components
+and backends should be positive for the baseline.
+
+**7.3 Validation Checklist**
+
+-   Baseline (C0 or C0b) shows at least 4/8 components above 3σ →
+    Hamiltonian is working
+
+-   C0b free \> C3 free when pooling shots → Degeneracy effect detected
+
+-   C3 shows forced-up/free-down asymmetry relative to C0b → Signature
+    of propagated degeneracy
+
+-   Bootstrap P(C0b_free \> C3_free) \> 95% → Statistically significant
+    support for conjecture
+
+**8. Circuit Difference Reference**
+
+For transparency, here is the EXACT and ONLY difference between the
+three circuits. Everything else --- initialization, Hamiltonian layers,
+measurement --- is byte-for-byte identical.
+
+**8.1 Circuit 0 (Baseline)**
+
+Step 1.5 does not exist. After initialization (Step 1), the Hamiltonian
+(Step 2) begins immediately.
+
+**8.2 Circuit 0b (Depth-Matched Control)**
+
+Step 1.5 inserts self-canceling CNOT pairs at all 8 sites:
+
+> // Site (0,0): identity on comp 0↔1, identity on comp 2↔3
+>
+> cx q\[0\], q\[1\]; cx q\[0\], q\[1\]; // cx;cx = identity
+>
+> cx q\[2\], q\[3\]; cx q\[2\], q\[3\]; // cx;cx = identity
+>
+> // \... repeated for all 8 sites (s=0,8,16,24,32,40,48,56)
+
+Total: 32 extra CX gates. Same qubits touched as C3. Zero degeneracy
+created.
+
+**8.3 Circuit 3 (Degeneracy)**
+
+Step 1.5 inserts single state-copying CNOTs at all 8 sites:
+
+> // Site (0,0): force comp 0 = comp 1, force comp 2 = comp 3
+>
+> cx q\[0\], q\[1\]; // copies state of q\[0\] onto q\[1\]
+>
+> cx q\[2\], q\[3\]; // copies state of q\[2\] onto q\[3\]
+>
+> // \... repeated for all 8 sites (s=0,8,16,24,32,40,48,56)
+
+Total: 16 extra CX gates. Creates eigenvalue multiplicity (double zeros)
+across entire lattice.
+
+*--- End of Replication Guide ---*
