@@ -1,0 +1,23 @@
+# Lake / Lean build artifacts
+.lake/
+lake-manifest.json
+lake-packages/
+build/
+*.olean
+*.ilean
+*.hash
+
+# LaTeX build artifacts (in case you build the PDF locally)
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+
+# OS
+.DS_Store
+Thumbs.db
