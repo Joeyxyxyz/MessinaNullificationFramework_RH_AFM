@@ -171,6 +171,5 @@ verification and the paper-specific identifier checks.
 ## Contact
 
 Joseph Messina — Independent Researcher
-Silver Springs, NV
 
 GitHub: [@Joeyxyxyz](https://github.com/Joeyxyxyz)
